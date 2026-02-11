@@ -1,6 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, Form
 import numpy as np
 import cv2
+import base64
 
 from app.services.inference_sam import sam_segment_from_box
 
@@ -22,7 +23,6 @@ async def sam_segment(
     mask = sam_segment_from_box(img, [x1, y1, x2, y2])
 
     ok, png = cv2.imencode(".png", mask)
+    b64 = base64.b64encode(png.tobytes()).decode()
 
-    return {
-        "mask_png": png.tobytes().hex()
-    }
+    return {"mask_base64": b64}
