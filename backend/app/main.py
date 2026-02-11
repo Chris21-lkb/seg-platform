@@ -1,6 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+
+from app.api.routes_sam import router as sam_router
+app.include_router(sam_router)
+
+
 app = FastAPI(title="Segmentation Platform API")
 
 # allow React dev server
