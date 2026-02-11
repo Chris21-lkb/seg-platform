@@ -7,14 +7,13 @@ from app.services.inference_sam import sam_segment_from_box
 
 router = APIRouter()
 
-
 @router.post("/sam/segment")
 async def sam_segment(
     image: UploadFile = File(...),
     x1: int = Form(...),
     y1: int = Form(...),
     x2: int = Form(...),
-    y2: int = Form(...)
+    y2: int = Form(...),
 ):
     data = await image.read()
     arr = np.frombuffer(data, np.uint8)
@@ -23,6 +22,8 @@ async def sam_segment(
     mask = sam_segment_from_box(img, [x1, y1, x2, y2])
 
     ok, png = cv2.imencode(".png", mask)
-    b64 = base64.b64encode(png.tobytes()).decode()
+    if not ok:
+        return {"error": "failed to encode mask"}
 
-    return {"mask_base64": b64}
+    mask_base64 = base64.b64encode(png.tobytes()).decode("utf-8")
+    return {"mask_base64": mask_base64}
